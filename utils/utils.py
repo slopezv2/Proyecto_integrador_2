@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 from typing import Tuple, Union, List
 from sklearn.model_selection import train_test_split
+from models.LogisticRegression import RegresionLogistica
+
+from models.Imodelos import Modelo
 
 XY = Tuple[np.ndarray, np.ndarray]
 Dataset = Tuple[XY, XY]
@@ -33,3 +36,11 @@ def cargar_datos(ruta_archivo: str, div_ratio=0.8) -> Dataset:
     x_train, x_test, y_train, y_test = train_test_split(
         X, y, train_size=div_ratio)
     return (x_train, y_train), (x_test, y_test)
+
+
+def preparar_datos(df_datos) -> pd.DataFrame:
+    df_datos.drop("fiebre", axis=1, inplace=True)
+    df_datos.drop("comuna", axis=1, inplace=True)
+    df_datos["sexo_"] = df_datos["sexo_"].astype("category")
+    df_datos["sexo_"] = df_datos["sexo_"].cat.codes
+    return df_datos.infer_objects()
