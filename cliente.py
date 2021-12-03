@@ -4,8 +4,8 @@ import argparse
 from pathlib import Path
 import pandas as pd
 import warnings
-from models.Imodelos import Modelo
-from models.LogisticRegression import RegresionLogistica
+from utils.Imodelos import Modelo
+from utils.LogisticRegression import RegresionLogistica
 
 from utils.utils import XY, particionar, preparar_datos
 
@@ -31,6 +31,9 @@ def escoger_modelo(tipo_modelo: str) -> Modelo:
         modelo = RegresionLogistica(
             20, 3, {"penalty": "l2", "max_iter": 1, "warm_start": True})
         return modelo
+    else:
+        raise Exception(
+            f"Modelo: {tipo_modelo} no ha sido implementado en el cliente")
 
 
 class FederadoCliente(fl.client.NumPyClient):

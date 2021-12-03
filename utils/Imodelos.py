@@ -1,5 +1,5 @@
 import abc
-import utils.utils as utiles
+from utils.utils import XY
 
 
 class Modelo(abc.ABCMeta):
@@ -21,9 +21,9 @@ class Modelo(abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def entrenar_modelo(self, datos_xy: utiles.XY):
+    def entrenar_modelo(self, datos_xy: XY):
         pass
 
     @abc.abstractmethod
-    def evaluar_modelo(self, datos_pruebas: utiles.XY):
+    def evaluar_modelo(self, datos_pruebas: XY):
         pass

@@ -2,9 +2,6 @@ import numpy as np
 import pandas as pd
 from typing import Tuple, Union, List
 from sklearn.model_selection import train_test_split
-from models.LogisticRegression import RegresionLogistica
-
-from models.Imodelos import Modelo
 
 XY = Tuple[np.ndarray, np.ndarray]
 Dataset = Tuple[XY, XY]
