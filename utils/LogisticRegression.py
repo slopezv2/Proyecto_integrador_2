@@ -1,12 +1,11 @@
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import log_loss, f1_score, recall_score, confusion_matrix, roc_auc_score
-import Imodelos
-from models.Imodelos import Modelo
 from utils.utils import LogRegParams, XY
+from utils.Imodelos import Modelo
 
 
-class RegresionLogistica(Imodelos.Modelo):
+class RegresionLogistica(Modelo):
     def __init__(self, caracteristicas: int, clases: int, configuracion: dict) -> None:
         self.modelo: LogisticRegression = LogisticRegression(**configuracion)
         self.clases = clases

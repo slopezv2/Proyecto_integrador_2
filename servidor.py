@@ -3,7 +3,7 @@ import flwr as fl
 import argparse
 from pathlib import Path
 import numpy as np
-from models.Imodelos import Modelo
+from utils.Imodelos import Modelo
 
 
 def enviar_ronda(rnd: int) -> dict:
