@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import log_loss, f1_score, recall_score, confusion_matrix, roc_auc_score
 import Imodelos
+from utils.utils import LogRegParams
 
 
 class RegresionLogistica(Imodelos.Modelo):
@@ -14,7 +15,7 @@ class RegresionLogistica(Imodelos.Modelo):
         if self.modelo.fit_intercept:
             self.modelo.intercept_ = np.zeros((clases,))
 
-    def obtener_parametros_modelo(self):
+    def obtener_parametros_modelo(self) -> LogRegParams:
         if self.modelo.fit_intercept:
             return (self.modelo.coef_, self.modelo.intercept_)
         else:
