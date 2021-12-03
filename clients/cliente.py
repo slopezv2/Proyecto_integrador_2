@@ -7,7 +7,7 @@ import warnings
 from models.Imodelos import Modelo
 from models.LogisticRegression import RegresionLogistica
 
-from utils.utils import XY, particionar
+from utils.utils import XY, particionar, preparar_datos
 
 
 def procesar_argumentos():
@@ -24,14 +24,6 @@ def procesar_argumentos():
     archivo = argv.archivo
     particiones = argv.particiones
     return modelo, archivo, particiones
-
-
-def preparar_datos(df_datos) -> pd.DataFrame:
-    df_datos.drop("fiebre", axis=1, inplace=True)
-    df_datos.drop("comuna", axis=1, inplace=True)
-    df_datos["sexo_"] = df_datos["sexo_"].astype("category")
-    df_datos["sexo_"] = df_datos["sexo_"].cat.codes
-    return df_datos.infer_objects()
 
 
 def escoger_modelo(tipo_modelo: str) -> Modelo:
