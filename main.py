@@ -26,8 +26,14 @@ def procesar_argumentos():
 
 
 def main():
+    procesos_cliente = []
     ruta_modelo, rondas, particiones, ruta_carpeta, modelo = procesar_argumentos
     archivos = glob.glob(f"{ruta_carpeta}/*")
-    ["python", ".\clients\cliente.py", ]
+    ejecutar_servidor = ["python", "servidor.py",
+                         "--ruta_modelos", ruta_modelo, "--rondas", rondas]
+    ejecutar_clientes = ["python", "cliente.py",
+                         "--modelo", modelo, "--particiones", str(particiones), "--archivo"]
     for archivo in archivos:
-        subprocess.run()
+        comando = ejecutar_clientes + [archivo]
+        print(comando)
+        proceso = subprocess.Popen(comando)

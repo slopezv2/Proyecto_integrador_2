@@ -68,7 +68,7 @@ class FederadoCliente(fl.client.NumPyClient):
 
 
 def main():
-    archivo, modelo_str, particiones = procesar_argumentos()
+    modelo_str, archivo, particiones = procesar_argumentos()
     ruta_archivo = Path(archivo)
     df_datos = pd.read_csv(ruta_archivo)
     df_datos = preparar_datos(df_datos)
@@ -81,7 +81,7 @@ def main():
     particion_id = (particion_id + 1) % particiones
     xy_pruebas = particiones_datos[particion_id]
     modelo = escoger_modelo(modelo_str)
-    fl.client.start_numpy_client("0.0.0.0:8080", FederadoCliente(
+    fl.client.start_numpy_client("0.0.0.0:8090", FederadoCliente(
         modelo, xy_entrenamiento, xy_pruebas))
 
 
