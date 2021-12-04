@@ -1,6 +1,7 @@
 import argparse
 import glob
 import subprocess
+from sys import stdout
 
 
 def procesar_argumentos():
@@ -27,13 +28,22 @@ def procesar_argumentos():
 
 def main():
     procesos_cliente = []
-    ruta_modelo, rondas, particiones, ruta_carpeta, modelo = procesar_argumentos
+    ruta_modelo, rondas, particiones, ruta_carpeta, modelo = procesar_argumentos()
     archivos = glob.glob(f"{ruta_carpeta}/*")
     ejecutar_servidor = ["python", "servidor.py",
                          "--ruta_modelos", ruta_modelo, "--rondas", rondas]
     ejecutar_clientes = ["python", "cliente.py",
                          "--modelo", modelo, "--particiones", str(particiones), "--archivo"]
-    for archivo in archivos:
-        comando = ejecutar_clientes + [archivo]
-        print(comando)
-        proceso = subprocess.Popen(comando)
+    with open("salida/servidor_log.txt", "w+") as log:
+        p_servidor = subprocess.Popen(
+            ejecutar_servidor, stdout=log, stderr=log)
+        for archivo in archivos:
+            comando = ejecutar_clientes + [archivo]
+            print(comando)
+            proceso = subprocess.Popen(comando)
+            procesos_cliente.append(proceso)
+        p_servidor.wait()
+
+
+if __name__ == "__main__":
+    main()
