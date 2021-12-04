@@ -43,7 +43,7 @@ class SaveModelStrategy(fl.server.strategy.FedAvg):
         aggregated_weights = super().aggregate_fit(rnd, results, failures)
         if aggregated_weights is not None:
             # Save aggregated_weights
-            print(f"Saving round {rnd} aggregated_weights...")
+            print(f"Guardando la ronda {rnd} aggregated_weights...")
             np.savez(Path(self.ruta_pesos_modelo).joinpath(
                 f"ronda-{rnd}-pesos.npz"), *aggregated_weights)
         return aggregated_weights
@@ -54,11 +54,12 @@ def main():
     # Create strategy and run server
     strategy = SaveModelStrategy(
         ruta_modelo=ruta_modelo,
-        min_available_clients=22
+        min_available_clients=2,
+        on_fit_config_fn=enviar_ronda
         # (same arguments as FedAvg here)
     )
-    fl.server.start_server(server_address="0.0.0.0:8090",
-                           strategy=strategy, config={"num_rounds": rondas})
+    fl.server.start_server(server_address="localhost:8090",
+                           strategy=strategy, config={"num_rounds": int(rondas)})
 
 
 if __name__ == "__main__":

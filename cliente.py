@@ -81,7 +81,7 @@ def main():
     particion_id = (particion_id + 1) % particiones
     xy_pruebas = particiones_datos[particion_id]
     modelo = escoger_modelo(modelo_str)
-    fl.client.start_numpy_client("0.0.0.0:8090", FederadoCliente(
+    fl.client.start_numpy_client("localhost:8090", FederadoCliente(
         modelo, xy_entrenamiento, xy_pruebas))
 
 
