@@ -30,8 +30,9 @@ def obtener_funcion_evaluacion(modelo: Modelo):
 
 class SaveModelStrategy(fl.server.strategy.FedAvg):
     def __init__(self, *args, **kwargs) -> None:
-        super(SaveModelStrategy, self).__init__(*args, **kwargs)
         self.ruta_pesos_modelo = kwargs.get("ruta_modelo")
+        kwargs.pop("ruta_modelo")
+        super(SaveModelStrategy, self).__init__(*args, **kwargs)
 
     def aggregate_fit(
         self,
@@ -53,7 +54,12 @@ def main():
     # Create strategy and run server
     strategy = SaveModelStrategy(
         ruta_modelo=ruta_modelo,
-
+        min_available_clients=22
         # (same arguments as FedAvg here)
     )
-    fl.server.start_server(strategy=strategy, config={"num_rounds": rondas})
+    fl.server.start_server(server_address="0.0.0.0:8090",
+                           strategy=strategy, config={"num_rounds": rondas})
+
+
+if __name__ == "__main__":
+    main()
