@@ -2,7 +2,7 @@ import abc
 from utils.utils import XY
 
 
-class Modelo(abc.ABCMeta):
+class Modelo(abc.ABC):
 
     @abc.abstractmethod
     def __init__(self, caracteristicas: int, clases: int, configuracion: dict) -> None:
@@ -10,7 +10,11 @@ class Modelo(abc.ABCMeta):
 
     @property
     def modelo(self):
-        return self.modelo
+        return self._modelo
+
+    @modelo.setter
+    def modelo(self, value):
+        self._modelo = value
 
     @abc.abstractmethod
     def obtener_parametros_modelo(self):
