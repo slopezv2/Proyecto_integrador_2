@@ -5,6 +5,7 @@ from sys import stdout
 
 
 def procesar_argumentos():
+    """Metodo para leer los argumentos por consola"""
     descripcion = "Programa Controlador, maneja el Servidor y Cliente, solo sirve con modelos scikit-learn"
     argumentos = argparse.ArgumentParser(description=descripcion)
     argumentos.add_argument("--ruta_modelos", dest="ruta_modelos",
@@ -27,9 +28,10 @@ def procesar_argumentos():
 
 
 def main():
+    """Metodo principal de la solucion, se encarga de crear diferentes procesos"""
     procesos_cliente = []
     ruta_modelo, rondas, particiones, ruta_carpeta, modelo = procesar_argumentos()
-    archivos = glob.glob(f"{ruta_carpeta}/*")
+    archivos = glob.glob(f"{ruta_carpeta}/*") # Listar los archivos de la ruta de datos procesados
     ejecutar_servidor = ["python", "servidor.py",
                          "--ruta_modelos", ruta_modelo, "--rondas", rondas]
     ejecutar_clientes = ["python", "cliente.py",
@@ -37,12 +39,15 @@ def main():
     with open("salida/servidor_log.txt", "a") as log:
         p_servidor = subprocess.Popen(
             ejecutar_servidor, stdout=log, stderr=log)
-        contador = 0
+        if modelo == "red_neuronal_desbalanceo":
+            contador = 0
+        else:
+            contador = -100
         for archivo in archivos:
             if modelo == "red_neuronal_desbalanceo":
                 contador += 1
             comando = ejecutar_clientes + [archivo]
-            if contador < 3:
+            if contador < 4:
                 print(comando)
                 proceso = subprocess.Popen(comando)
                 procesos_cliente.append(proceso)

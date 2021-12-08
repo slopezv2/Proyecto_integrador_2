@@ -5,10 +5,12 @@ from utils.Imodelos import Modelo
 import numpy as np
 
 class SupportVectorMachine(Modelo):
+    """Implementacion especifica de support vector machine con SGDClassifier"""
     def __init__(self, caracteristicas: int, clases: int, configuracion: dict) -> None:
         self.modelo: SGDClassifier = SGDClassifier(**configuracion)
         self.clases = clases
         self.caracteristicas = caracteristicas
+        #inicializar el modelo
         self.modelo.classes_ = np.array(range(clases))
         self.modelo.coef_ = np.zeros((clases, caracteristicas))
         if self.modelo.fit_intercept:
@@ -32,10 +34,9 @@ class SupportVectorMachine(Modelo):
     def evaluar_modelo(self, datos_pruebas: XY):
         y_pred = self.modelo.predict(datos_pruebas[0])
         y_pred_proba = self.modelo.predict_proba(datos_pruebas[0])
-        perdida = log_loss(datos_pruebas[1], y_pred_proba)
+        perdida = log_loss(datos_pruebas[1], y_pred_proba, labels=[0,1,2])
         accuracy = self.modelo.score(datos_pruebas[0], datos_pruebas[1])
         f1 = f1_score(datos_pruebas[1], y_pred, average="macro")
-        #matriz_confusion = confusion_matrix(datos_pruebas[1], y_pred)
         roc_auc = roc_auc_score(
             datos_pruebas[1], y_pred_proba, average="macro", multi_class="ovo")
         recall = recall_score(datos_pruebas[1], y_pred, average="macro")

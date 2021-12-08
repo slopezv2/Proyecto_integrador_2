@@ -6,6 +6,7 @@ from utils.Imodelos import Modelo
 
 
 class RegresionLogistica(Modelo):
+    """Implementacion de Regresion Logistica"""
     def __init__(self, caracteristicas: int, clases: int, configuracion: dict) -> None:
         self.modelo: LogisticRegression = LogisticRegression(**configuracion)
         self.clases = clases
@@ -35,7 +36,6 @@ class RegresionLogistica(Modelo):
         perdida = log_loss(datos_pruebas[1], y_pred_proba)
         accuracy = self.modelo.score(datos_pruebas[0], datos_pruebas[1])
         f1 = f1_score(datos_pruebas[1], y_pred, average="macro")
-        #matriz_confusion = confusion_matrix(datos_pruebas[1], y_pred)
         roc_auc = roc_auc_score(
             datos_pruebas[1], y_pred_proba, average="macro", multi_class="ovo")
         recall = recall_score(datos_pruebas[1], y_pred, average="macro")
