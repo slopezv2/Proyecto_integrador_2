@@ -12,6 +12,7 @@ def enviar_ronda(rnd: int) -> dict:
 
 
 def procesar_argumentos():
+    """Funcion para leer los argumentos y obtener los parametros por consola para ejecutar  el programa servidor"""
     descripcion = "Programa servidor del modelo de aprendizaje federado"
     argumentos = argparse.ArgumentParser(description=descripcion)
     argumentos.add_argument("--ruta_modelos", dest="ruta_modelos",
@@ -25,14 +26,17 @@ def procesar_argumentos():
 
 
 def obtener_funcion_evaluacion(modelo: Modelo):
+    """En caso de necesitas implementar una evaluación centralizada del modelo"""
     pass
 
 
 class SaveModelStrategy(fl.server.strategy.FedAvg):
+    """Clase especial para implementar la estrategia de evaluación del metodo.
+    Permite guardar los pesos de cada modelo para un posterior uso"""
     def __init__(self, *args, **kwargs) -> None:
-        self.ruta_pesos_modelo = kwargs.get("ruta_modelo")
+        self.ruta_pesos_modelo = kwargs.get("ruta_modelo") # ruta para guardar los modelos
         kwargs.pop("ruta_modelo")
-        super(SaveModelStrategy, self).__init__(*args, **kwargs)
+        super(SaveModelStrategy, self).__init__(*args, **kwargs) # seguir lo mismo de la estrategia FedAVG
 
     def aggregate_fit(
         self,
@@ -40,12 +44,12 @@ class SaveModelStrategy(fl.server.strategy.FedAvg):
         results: List[Tuple[fl.server.client_proxy.ClientProxy, fl.common.FitRes]],
         failures: List[BaseException],
     ) -> Optional[fl.common.Weights]:
+        """Metodo sobrecargado para guardar el modelo"""
         aggregated_weights = super().aggregate_fit(rnd, results, failures)
         if aggregated_weights is not None:
-            # Save aggregated_weights
-            print(f"Guardando la ronda {rnd} aggregated_weights...")
+            print(f"Guardando la ronda {rnd}")
             np.savez(Path(self.ruta_pesos_modelo).joinpath(
-                f"ronda-{rnd}-pesos.npz"), *aggregated_weights)
+                f"ronda-{rnd}-pesos.npz"), *aggregated_weights) #Guardar pesos modelos
         return aggregated_weights
 
 
@@ -54,7 +58,8 @@ def main():
     # Create strategy and run server
     strategy = SaveModelStrategy(
         ruta_modelo=ruta_modelo,
-        min_available_clients=2,
+        min_available_clients=10,
+        min_fit_clients=10,
         on_fit_config_fn=enviar_ronda
         # (same arguments as FedAvg here)
     )

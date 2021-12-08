@@ -1,8 +1,11 @@
+#Utilidades de la solucion
+
 import numpy as np
 import pandas as pd
 from typing import Tuple, Union, List
 from sklearn.model_selection import train_test_split
 
+# Tipo de datos para llevar las variables independientes y la dependiente
 XY = Tuple[np.ndarray, np.ndarray]
 Dataset = Tuple[XY, XY]
 LogRegParams = Union[XY, Tuple[np.ndarray]]
@@ -10,14 +13,15 @@ XYList = List[XY]
 
 
 def revolver(X: np.ndarray, y: np.ndarray) -> XY:
-    """Shuffle X and y."""
+    """Revolver el dataset"""
     rng = np.random.default_rng()
     idx = rng.permutation(len(X))
     return X[idx], y[idx]
 
 
 def particionar(X: np.ndarray, y: np.ndarray, num_partitions: int) -> XYList:
-    """Split X and y into a number of partitions."""
+    """Primera idea de particionamiento.
+    Se deja para posteriores usos"""
     return list(
         zip(np.array_split(X, num_partitions),
             np.array_split(y, num_partitions))
@@ -36,6 +40,8 @@ def cargar_datos(ruta_archivo: str, div_ratio=0.8) -> Dataset:
 
 
 def preparar_datos(df_datos) -> pd.DataFrame:
+    """Limpieza de los datos, fiebre y comuna se remueven. 
+    Sexo para a ser categorica con valores numericos"""
     df_datos.drop("fiebre", axis=1, inplace=True)
     df_datos.drop("comuna", axis=1, inplace=True)
     df_datos["sexo_"] = df_datos["sexo_"].astype("category")
