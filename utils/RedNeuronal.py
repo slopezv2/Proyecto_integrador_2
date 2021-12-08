@@ -29,10 +29,10 @@ class RedNeuronal(Modelo):
         self.modelo.set_weights(parametros)
 
     def entrenar_modelo(self, datos_xy: XY):
-        self.modelo.fit(datos_xy[0], datos_xy[1],epochs=20, batch_size=32, class_weight= self.pesos_clases)
+
+        self.modelo.fit(datos_xy[0], datos_xy[1],epochs=10, batch_size=32)
 
     def evaluar_modelo(self, datos_pruebas: XY):
-        self.xy_prueba
         perdida, accuracy = self.modelo.evaluate(datos_pruebas[0], datos_pruebas[1])
         dic_medidas = self.modelo.evaluate(datos_pruebas[0],datos_pruebas[1],return_dict=True)
         return perdida, len(datos_pruebas[1]), dic_medidas

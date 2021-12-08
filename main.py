@@ -34,14 +34,18 @@ def main():
                          "--ruta_modelos", ruta_modelo, "--rondas", rondas]
     ejecutar_clientes = ["python", "cliente.py",
                          "--modelo", modelo, "--porcentaje-entrenamiento", str(particiones), "--archivo"]
-    with open("salida/servidor_log.txt", "w+") as log:
+    with open("salida/servidor_log.txt", "a") as log:
         p_servidor = subprocess.Popen(
             ejecutar_servidor, stdout=log, stderr=log)
+        contador = 0
         for archivo in archivos:
+            if modelo == "red_neuronal_desbalanceo":
+                contador += 1
             comando = ejecutar_clientes + [archivo]
-            print(comando)
-            proceso = subprocess.Popen(comando)
-            procesos_cliente.append(proceso)
+            if contador < 3:
+                print(comando)
+                proceso = subprocess.Popen(comando)
+                procesos_cliente.append(proceso)
         p_servidor.wait()
 
 

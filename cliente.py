@@ -7,10 +7,10 @@ import warnings
 from utils.Imodelos import Modelo
 from utils.LogisticRegression import RegresionLogistica
 from utils.SupportVectorMachine import SupportVectorMachine
-from utils.RedNeuronal import RedNeuronal
-from utils.utils import XY, particionar, preparar_datos
+from utils.BosqueAleatorio import BosqueAleatorio
+from utils.utils import XY, preparar_datos
 from sklearn.model_selection import train_test_split
-from tensorflow import keras
+
 
 def procesar_argumentos():
     descripcion = "Programa cliente del modelo de aprendizaje federado"
@@ -31,21 +31,25 @@ def procesar_argumentos():
 def escoger_modelo(tipo_modelo: str, pesos_clases = None) -> Modelo:
     if tipo_modelo == "regresion_logistica":
         modelo = RegresionLogistica(
-            20, 3, {"penalty": "l2", "max_iter": 1, "warm_start": True})
+            21, 3, {"penalty": "l2", "max_iter": 1, "warm_start": True, "class_weight": pesos_clases})
         return modelo
     if tipo_modelo == "support_vector":
-        modelo = SupportVectorMachine(20,3,{  "penalty": "elasticnet", "shuffle": True, "n_jobs": -1, "loss": "log"})
+        modelo = SupportVectorMachine(21,3,{  "penalty": "elasticnet", "shuffle": True, "n_jobs": -1, "loss": "log", "class_weight": pesos_clases})
         return modelo
     if tipo_modelo == "red_neuronal_desbalanceo":
-        modelo = RedNeuronal(20,3,{"red_neuronal": [keras.layers.Dense(
-            256, activation="relu", input_shape=(20,)
+        from tensorflow import keras
+        from utils.RedNeuronal import RedNeuronal
+        modelo = RedNeuronal(21,3,{"red_neuronal": [keras.layers.Dense(
+            10, activation="relu", input_shape=(21,)
         ),
-        keras.layers.Dense(256, activation="relu"),
+        keras.layers.Dense(5, activation="relu"),
         keras.layers.Dropout(0.3),
-        keras.layers.Dense(256, activation="relu"),
+        keras.layers.Dense(5, activation="relu"),
         keras.layers.Dropout(0.3),
-        keras.layers.Dense(2, activation="sigmoid")], "pesos_clases": pesos_clases})
+        keras.layers.Dense(1, activation="sigmoid")], "pesos_clases": pesos_clases})
         return modelo
+    if tipo_modelo == "bosque_aleatorio":
+        modelo = BosqueAleatorio(20,3,{"class_weight": pesos_clases})
     else:
         raise Exception(
             f"Modelo: {tipo_modelo} no ha sido implementado en el cliente")
@@ -92,20 +96,22 @@ def main():
     X = df_datos.drop("clas_dengue", axis=1).to_numpy()
     Y = df_datos["clas_dengue"].to_numpy()
     conteos = np.bincount(Y)
-    print(conteos)
+    #print(conteos)
     weight_for_0 = 1.0 / conteos[0]
     weight_for_1 = 1.0 / conteos[1]
     weight_for_3 = 1.0 / conteos[3]
+    clases_pesos = {0:weight_for_0,1:weight_for_1, 3:weight_for_3}
     X_train, X_test, y_train, y_test = train_test_split(X, Y,train_size=float(particiones))
     xy_entrenamiento = (X_train, y_train)
     xy_pruebas = (X_test, y_test)
+    print()
     #particion_id = np.random.choice(particiones)
     #particiones_datos = particionar(
     #    X, Y, particiones)
     #xy_entrenamiento = particiones_datos[particion_id]
     #particion_id = (particion_id + 1) % particiones
     #xy_pruebas = particiones_datos[particion_id]
-    modelo = escoger_modelo(modelo_str)
+    modelo = escoger_modelo(modelo_str,clases_pesos)
     fl.client.start_numpy_client("localhost:8090", FederadoCliente(
         modelo, xy_entrenamiento, xy_pruebas))
 
