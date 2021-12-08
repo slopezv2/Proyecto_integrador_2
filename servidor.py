@@ -54,7 +54,8 @@ def main():
     # Create strategy and run server
     strategy = SaveModelStrategy(
         ruta_modelo=ruta_modelo,
-        min_available_clients=2,
+        min_available_clients=22,
+        min_fit_clients=15,
         on_fit_config_fn=enviar_ronda
         # (same arguments as FedAvg here)
     )

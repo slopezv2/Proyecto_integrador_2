@@ -6,9 +6,9 @@ import pandas as pd
 import warnings
 from utils.Imodelos import Modelo
 from utils.LogisticRegression import RegresionLogistica
-
+from utils.SupportVectorMachine import SupportVectorMachine
 from utils.utils import XY, particionar, preparar_datos
-
+from sklearn.model_selection import train_test_split
 
 def procesar_argumentos():
     descripcion = "Programa cliente del modelo de aprendizaje federado"
@@ -17,8 +17,8 @@ def procesar_argumentos():
                             default="regresion_logistica", type=str)
     argumentos.add_argument("--archivo", dest="archivo", required=True,
                             help="Ruta hasta el archivo e incluyendolo", type=str)
-    argumentos.add_argument("--particiones", dest="particiones",
-                            help="cantidad de particiones", type=int, default=10)
+    argumentos.add_argument("--porcentaje-entrenamiento", dest="particiones",
+                            help="Porcentaje del dataset para emplear como entrenamiento", type=float, default=0.8)
     argv = argumentos.parse_args()
     modelo = argv.modelo_a_usar
     archivo = argv.archivo
@@ -30,6 +30,9 @@ def escoger_modelo(tipo_modelo: str) -> Modelo:
     if tipo_modelo == "regresion_logistica":
         modelo = RegresionLogistica(
             20, 3, {"penalty": "l2", "max_iter": 1, "warm_start": True})
+        return modelo
+    if tipo_modelo == "support_vector":
+        modelo = SupportVectorMachine(20,3,{  "penalty": "elasticnet", "shuffle": True, "n_jobs": -1, "loss": "log"})
         return modelo
     else:
         raise Exception(
@@ -61,7 +64,9 @@ class FederadoCliente(fl.client.NumPyClient):
     def evaluate(self, parameters, config):  # type: ignore
         self.modelo.asignar_parametros_modelo(parameters)
         #utils.set_model_params(model, parameters)
-        return self.modelo.evaluar_modelo(self.xy_prueba)
+        salida = self.modelo.evaluar_modelo(self.xy_prueba)
+        print(salida)
+        return salida
         #loss = log_loss(y_test, model.predict_proba(X_test))
         #accuracy = model.score(X_test, y_test)
         # return loss, len(X_test), {"accuracy": accuracy}
@@ -74,12 +79,15 @@ def main():
     df_datos = preparar_datos(df_datos)
     X = df_datos.drop("clas_dengue", axis=1).to_numpy()
     Y = df_datos["clas_dengue"].to_numpy()
-    particion_id = np.random.choice(particiones)
-    particiones_datos = particionar(
-        X, Y, particiones)
-    xy_entrenamiento = particiones_datos[particion_id]
-    particion_id = (particion_id + 1) % particiones
-    xy_pruebas = particiones_datos[particion_id]
+    X_train, X_test, y_train, y_test = train_test_split(X, Y,train_size=float(particiones))
+    xy_entrenamiento = (X_train, y_train)
+    xy_pruebas = (X_test, y_test)
+    #particion_id = np.random.choice(particiones)
+    #particiones_datos = particionar(
+    #    X, Y, particiones)
+    #xy_entrenamiento = particiones_datos[particion_id]
+    #particion_id = (particion_id + 1) % particiones
+    #xy_pruebas = particiones_datos[particion_id]
     modelo = escoger_modelo(modelo_str)
     fl.client.start_numpy_client("localhost:8090", FederadoCliente(
         modelo, xy_entrenamiento, xy_pruebas))

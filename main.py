@@ -11,8 +11,8 @@ def procesar_argumentos():
                             required=True, type=str, help="Ruta para guardar los pesos de los modelos")
     argumentos.add_argument("--rondas", dest="rondas", required=True,
                             help="Cantidad de rondas, por defecto son 5", type=str, default=5)
-    argumentos.add_argument("--particiones", dest="particiones",
-                            help="cantidad de particiones para dividir los datos, una se una para entrenar y otra para evaluar, las demas no se usan en esta iteracion", type=int, default=5)
+    argumentos.add_argument("--porcentaje-entrenamiento", dest="particiones",
+                            help="Porcentaje del dataset para emplear como entrenamiento", type=float, default=0.8)
     argumentos.add_argument("--ruta_carpeta", dest="ruta_carpeta",
                             required=True, type=str, help="Ruta para leer los archivos y simular un cliente independiente por cada archivo")
     argumentos.add_argument("--modelo", dest="modelo_a_usar",
@@ -33,7 +33,7 @@ def main():
     ejecutar_servidor = ["python", "servidor.py",
                          "--ruta_modelos", ruta_modelo, "--rondas", rondas]
     ejecutar_clientes = ["python", "cliente.py",
-                         "--modelo", modelo, "--particiones", str(particiones), "--archivo"]
+                         "--modelo", modelo, "--porcentaje-entrenamiento", str(particiones), "--archivo"]
     with open("salida/servidor_log.txt", "w+") as log:
         p_servidor = subprocess.Popen(
             ejecutar_servidor, stdout=log, stderr=log)
